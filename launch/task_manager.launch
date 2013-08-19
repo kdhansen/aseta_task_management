@@ -1,0 +1,3 @@
+<launch>
+	<node name="task_manager" pkg="aseta_task_management" type="task_manager" output="screen" />
+</launch>

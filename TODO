@@ -1,0 +1,13 @@
+Version 0.1
+ - Make Task Manager
+   - Implement list of tasks (outstanding, finished).
+   - Implement actionlib client for planner.
+
+ - Make Task Planner
+   - Implement actionlib server.
+   - Implement genetic algorithm.
+
+ + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
+
+Version 0.2
+ - Make "Register Task" command line utility
