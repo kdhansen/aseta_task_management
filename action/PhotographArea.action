@@ -1,9 +1,0 @@
-# Goal
-geometry_msgs/Polygon area # Polygon to photograph
-float32 mm_pr_px # Resolution of the images
----
-# Result
-uint32 num_images_taken
----
-# Feedback message
-float32 percent_complete

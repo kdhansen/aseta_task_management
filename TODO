@@ -1,13 +1,23 @@
-Version 0.1
- - Make Task Manager
-   - Implement list of tasks (outstanding, finished).
-   - Implement actionlib client for planner.
+ASETA Task management system:
 
- - Make Task Planner
-   - Implement actionlib server.
-   - Implement genetic algorithm.
+Version 0.1:
+    Version 0.1 will be funtional with no bells and whistles.
+    - Implement actionlib client for drone.
+    - Implement actionlib server for registering tasks.
+    Task Manager:
+        - Implement list of outstanding/finished tasks.
+    Decomposer:
+        - Implement covering algorithm.
+    Planner:
+        - Implement genetic algorithm.
+    Utillities:
+        - Implement command line utility.
+        + Implement dummy drone. @done (13-08-20 16:15)
+    Minor tasks:
+     + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
 
- + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
+Version 0.2:
+    Version 0.2 will include unit tests and ros network tests.
 
-Version 0.2
- - Make "Register Task" command line utility
+Version 1.0:
+    Version 0.2 will have been presented to the rest of the ASETA group. Version 1.0 includes bugfixes from this review.
