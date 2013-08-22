@@ -15,6 +15,7 @@ Version 0.1:
         + Implement dummy drone. @done (13-08-20 16:15)
     Minor tasks:
      + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
+     - Debug boost::geometry for  queer disjoint predicate behaviour.
 
 Version 0.2:
     Version 0.2 will include unit tests and ros network tests.

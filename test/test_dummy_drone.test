@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="aseta_task_management" type="dummy_drone" name="dummy_drone" />
+  <test test-name="test_dummy_drone" pkg="aseta_task_management" type="test_dummy_drone" />
+</launch>
