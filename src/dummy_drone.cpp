@@ -41,7 +41,7 @@ namespace aseta
 
 			ros::Rate r(1);
 			bool succes = true;
-			for (int t = 10; t > 0; --t)
+			for (int t = 3; t > 0; --t)
 			{
 				// Check for preemption.
 				if (_as.isPreemptRequested() || !ros::ok())
@@ -53,12 +53,14 @@ namespace aseta
 				}
 				// If task was not preempted go towards goal.
 				ROS_INFO_STREAM("Time to target: " << t << " seconds.");
+				aseta_task_management::PhotoWaypointFeedback _feedback;
 				_feedback.time_to_target = t;
 				_as.publishFeedback(_feedback);
 				r.sleep();
 			}
 			if (succes)
 			{
+				aseta_task_management::PhotoWaypointResult _result;
 				ros::Time now = ros::Time::now();
 				_result.pose_stamped.pose = goal_->pose;
 				_result.pose_stamped.header.stamp = now;
@@ -75,8 +77,6 @@ namespace aseta
 	private:
 		ros::NodeHandle _priv_nh; // not priv as in private member (although it is) but in the private ROS namespace "~".
 		actionlib::SimpleActionServer<aseta_task_management::PhotoWaypointAction> _as;
-		aseta_task_management::PhotoWaypointFeedback _feedback;
-		aseta_task_management::PhotoWaypointResult _result;
 	};
 
 

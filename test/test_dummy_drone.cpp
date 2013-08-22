@@ -1,6 +1,6 @@
 /*
-TEst for ASETA Dummy Drone
-Integration testing of the dummu drone for the ASETA system.
+Test for ASETA Dummy Drone
+Integration testing of the dummy drone for the ASETA system.
 Copyright (C) 2013 Karl D. Hansen (kdh@es.aau.dk)
 
 This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
+#include <gtest/gtest.h>
+#include <ros/ros.h>
 #include "aseta_task_management/PhotoWaypointAction.h"
 
-int main(int argc, char *argv[])
+// Declare a test
+TEST(DummyDrone, executeTask)
 {
-	ros::init(argc, argv, "test_dummy_drone");
-
 	actionlib::SimpleActionClient<aseta_task_management::PhotoWaypointAction> ac("dummy_drone/task_server", true);
 
 	ROS_INFO("Waiting for action server to start.");
@@ -50,5 +50,13 @@ int main(int argc, char *argv[])
 	else
 		ROS_INFO("Action did not finish before the time out.");
 
-	return 0;
+	EXPECT_TRUE(finished_before_timeout);
+}
+
+int main(int argc, char *argv[])
+{
+	ros::init(argc, argv, "test_dummy_drone");
+	testing::InitGoogleTest(&argc, argv);
+
+	return RUN_ALL_TESTS();
 }
