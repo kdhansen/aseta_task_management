@@ -28,18 +28,40 @@ namespace aseta
             priv_nh.advertiseService("register_task",
                                      &TaskManager::registerTaskCb,
                                      this);
-        ros::spin();
+        field_pub = priv_nh.advertise<geometry_msgs::PolygonStamped>("field", 1);
+        field_timer = priv_nh.createTimer(ros::Duration(1.0), &TaskManager::publishField, this);
     }
 
     TaskManager::~TaskManager()
     {}
 
     bool TaskManager::registerTaskCb(
-        aseta_task_management::PhotographArea::Request &req_,
-        aseta_task_management::PhotographArea::Response &res_)
+        aseta_task_management::PhotographArea::Request &req,
+        aseta_task_management::PhotographArea::Response &res)
     {
         ROS_INFO("Registering task.");
+
+        // If this is the first request, we will assume that this
+        // is the field.
+        if (field.points.size() == 0)
+        {
+            field = req.area;
+            for (auto p : field.points)
+                ROS_INFO_STREAM("Poly point: [" << p.x << " " << p.y << "]");
+        }
         return true;
+    }
+
+    void TaskManager::publishField(const ros::TimerEvent&)
+    {
+        if (field.points.size() > 0)
+        {
+            geometry_msgs::PolygonStamped f;
+            f.polygon = field;
+            f.header.stamp = ros::Time::now();
+            f.header.frame_id = "map";
+            field_pub.publish(f);
+        }
     }
 }
 
@@ -47,5 +69,6 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "task_manager");
     aseta::TaskManager tm;
+    ros::spin();
     return 0;
 }

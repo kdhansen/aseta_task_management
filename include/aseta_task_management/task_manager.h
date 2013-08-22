@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
+#include <geometry_msgs/PolygonStamped.h>
 #include <ros/ros.h>
 #include "aseta_task_management/PhotographArea.h"
 
@@ -34,9 +35,14 @@ namespace aseta
 	private:
 		ros::NodeHandle priv_nh;
 		ros::ServiceServer register_task_service;
+		geometry_msgs::Polygon field;
+		ros::Publisher field_pub;
+		ros::Timer field_timer;
 
 		bool registerTaskCb(aseta_task_management::PhotographArea::Request &,
 			                  aseta_task_management::PhotographArea::Response &);
+
+		void publishField(const ros::TimerEvent&);
 	};
 };
 

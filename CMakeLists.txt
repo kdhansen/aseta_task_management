@@ -38,6 +38,10 @@ add_executable(task_manager src/task_manager.cpp)
 target_link_libraries(task_manager ${catkin_LIBRARIES} decomposer)
 add_dependencies(task_manager ${PROJECT_NAME}_gencpp)
 
+add_executable(register_task src/register_task.cpp)
+target_link_libraries(register_task ${catkin_LIBRARIES})
+add_dependencies(register_task task_manager ${PROJECT_NAME}_gencpp)
+
 add_executable(dummy_drone src/dummy_drone.cpp)
 target_link_libraries(dummy_drone ${catkin_LIBRARIES})
 add_dependencies(dummy_drone ${PROJECT_NAME}_gencpp)
