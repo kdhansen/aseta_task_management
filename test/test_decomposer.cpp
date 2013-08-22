@@ -48,6 +48,29 @@ TEST(Decomposer, rightHeigth)
 	EXPECT_LT(1-waypoints[0].z, 0.001);
 }
 
+TEST(Decomposer, includeAllFootprints)
+{
+	aseta::Decomposer d(100,100,0.01,10,10);
+	
+	geometry_msgs::Polygon poly;
+	float x[] = {1, 2, 2, 1};
+	float y[] = {1, 1, 2, 2};
+	for (int i = 0; i < 4; ++i)
+	{
+		geometry_msgs::Point32 p;
+		p.x = x[i];
+		p.y = y[i];
+		p.z = 0;
+		poly.points.push_back(p);
+	}
+
+	std::vector<geometry_msgs::Point> waypoints;
+
+	d.decompose(poly, waypoints);
+
+	EXPECT_EQ(121, waypoints.size());
+}
+
 int main(int argc, char *argv[])
 {
 	testing::InitGoogleTest(&argc, argv);
