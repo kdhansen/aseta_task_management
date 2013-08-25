@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(aseta_task_management)
 
 find_package(catkin REQUIRED COMPONENTS actionlib_msgs actionlib geometry_msgs sensor_msgs roscpp rostest)
-find_package(Boost REQUIRED COMPONENTS system)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
 
@@ -28,7 +27,6 @@ catkin_package(
 include_directories(
 	include
 	${catkin_INCLUDE_DIRS}
-	${Boost_INCLUDE_DIRS}
 )
 
 add_library(decomposer src/decomposer.cpp)

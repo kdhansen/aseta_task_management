@@ -7,7 +7,7 @@ Version 0.1:
     Task Manager:
         - Implement list of outstanding/finished tasks.
         - Publish waypoints to rviz.
-        - Publish the field to rviz.
+        + Publish the field to rviz. @done (13-08-23 10:25)
     Decomposer:
         + Implement covering algorithm. @done (13-08-22 17:00)
     Planner:
