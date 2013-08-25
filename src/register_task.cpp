@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <ros/ros.h>
+#include <string>
 #include <geometry_msgs/Polygon.h>
 #include "aseta_task_management/PhotographArea.h"
 
@@ -26,14 +28,21 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "register_task");
 
     geometry_msgs::Polygon poly;
-    float x[] = {1, 2, 2, 1};
-    float y[] = {1, 1, 2, 2};
-    for (int i = 0; i < 4; ++i)
+
+    int n_wps;
+    std::cout << "How many waypoints do you want to enter?: ";
+    std::cin >> n_wps;
+    for (int i = 0; i < n_wps; ++i)
     {
+        float x, y;
+        std::cout << "Enter waypoint #" << i << ":" << std::endl;
+        std::cout << "x: ";
+        std::cin >> x;
+        std::cout << "y: ";
+        std::cin >> y;
         geometry_msgs::Point32 p;
-        p.x = x[i];
-        p.y = y[i];
-        p.z = 0;
+        p.x = x;
+        p.y = y;
         poly.points.push_back(p);
     }
 
