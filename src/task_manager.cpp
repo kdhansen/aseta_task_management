@@ -27,6 +27,10 @@ namespace aseta
         priv_nh("~")
     {
         priv_nh.param<std::string>("reference_frame", reference_frame, "map");
+        priv_nh.param("camera_sensor_width", camera_sensor_width, 640);
+        priv_nh.param("camera_sensor_height", camera_sensor_height, 480);
+        priv_nh.param("camera_focal_length_x", camera_focal_length_x, camera_sensor_width*1.1);
+        priv_nh.param("camera_focal_length_y", camera_focal_length_y, camera_sensor_height*1.1);
         register_task_service = 
             priv_nh.advertiseService("register_task",
                                      &TaskManager::registerTaskCb,
@@ -58,7 +62,7 @@ namespace aseta
         }
 
         // Decompose the task and put the waypoints into the list.
-        aseta::Decomposer d(100,100,0.01,10,10);
+        aseta::Decomposer d(camera_focal_length_x, camera_focal_length_y, req.m_pr_px, camera_sensor_height, camera_sensor_width);
         d.decompose(req.area, waypoints);
 
         return true;

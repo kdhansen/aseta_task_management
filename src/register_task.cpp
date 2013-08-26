@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
 
     aseta_task_management::PhotographArea pa;
     pa.request.area = poly;
-    pa.request.mm_pr_px = 0.1;
+    std::cout << "What resolution?: ";
+    std::cin >> pa.request.m_pr_px;
 
     if (ros::service::call("/task_manager/register_task", pa))
     {

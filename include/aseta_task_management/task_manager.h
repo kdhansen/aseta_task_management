@@ -49,6 +49,9 @@ namespace aseta
 		ros::Publisher waypoint_pub;
 		ros::Timer waypoint_timer;
 
+		int camera_sensor_width, camera_sensor_height;
+		double camera_focal_length_x, camera_focal_length_y;
+
 		bool registerTaskCb(aseta_task_management::PhotographArea::Request &,
 			                  aseta_task_management::PhotographArea::Response &);
 
