@@ -6,21 +6,29 @@ Version 0.1:
     - Implement actionlib server for registering tasks.
     Task Manager:
         - Implement list of outstanding/finished tasks.
-        - Publish waypoints to rviz.
+        + Publish waypoints to rviz. @done (13-08-26 14:50)
         + Publish the field to rviz. @done (13-08-23 10:25)
     Decomposer:
         + Implement covering algorithm. @done (13-08-22 17:00)
     Planner:
         - Implement genetic algorithm.
+        - Thread the genetic algorithm, so that we can pump a lot of waypoints into it.
     Utillities:
         - Implement command line utility.
         + Implement dummy drone. @done (13-08-20 16:15)
     Minor tasks:
      + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
      - Debug boost::geometry for queer disjoint predicate behaviour.
+     - Use rqt launcher
 
 Version 0.2:
     Version 0.2 will include unit tests and ros network tests.
+     - In cli: Check file existence.
+     - Modify stream output of Problem/Waypoint/Solution to match TSPLIB.
+     - Export time in history.
+     - Implement adaptive termination criterion.
+     - Implement crossover.
+     - Figure out if clone can be optimized by only copying the solution.
 
 Version 1.0:
     Version 0.2 will have been presented to the rest of the ASETA group. Version 1.0 includes bugfixes from this review.

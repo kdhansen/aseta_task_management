@@ -26,15 +26,22 @@ namespace aseta
     TaskManager::TaskManager() :
         priv_nh("~")
     {
+        // Get parameters
         priv_nh.param<std::string>("reference_frame", reference_frame, "map");
         priv_nh.param("camera_sensor_width", camera_sensor_width, 640);
         priv_nh.param("camera_sensor_height", camera_sensor_height, 480);
         priv_nh.param("camera_focal_length_x", camera_focal_length_x, camera_sensor_width*1.1);
         priv_nh.param("camera_focal_length_y", camera_focal_length_y, camera_sensor_height*1.1);
+
+        // The register task service lets users (or ros nodes) supply the manager
+        // with areas that must be photographed.
         register_task_service = 
             priv_nh.advertiseService("register_task",
                                      &TaskManager::registerTaskCb,
                                      this);
+
+        // The field and waypoint publishers, shows the state of the mission
+        // to rviz.
         field_pub = priv_nh.advertise<geometry_msgs::PolygonStamped>("field", 1);
         field_timer = priv_nh.createTimer(ros::Duration(1.0), &TaskManager::publishField, this);
         waypoint_pub = priv_nh.advertise<geometry_msgs::PoseArray>("waypoints", 1);
