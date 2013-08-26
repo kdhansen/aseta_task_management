@@ -3,6 +3,10 @@ project(aseta_task_management)
 
 find_package(catkin REQUIRED COMPONENTS actionlib_msgs actionlib geometry_msgs sensor_msgs roscpp rostest)
 find_package(Boost REQUIRED COMPONENTS system)
+find_library(Clippoly "libclippoly.so")
+if(${Clippoly} STREQUAL "Clippoly-NOTFOUND")
+	return()
+endif(${Clippoly} STREQUAL "Clippoly-NOTFOUND")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
 
@@ -32,7 +36,7 @@ include_directories(
 )
 
 add_library(decomposer src/decomposer.cpp)
-target_link_libraries(decomposer ${catkin_LIBRARIES})
+target_link_libraries(decomposer ${catkin_LIBRARIES} ${Clippoly})
 
 add_executable(task_manager src/task_manager.cpp)
 target_link_libraries(task_manager ${catkin_LIBRARIES} decomposer)

@@ -21,9 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmath>
 #include <limits>
 #include <boost/bind.hpp>
-#include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
+#include <clippoly/poly.h>
+#include <clippoly/nclip.h>
 #include "aseta_task_management/decomposer.h"
 
 namespace aseta
@@ -77,12 +76,10 @@ namespace aseta
     void Decomposer::decompose(geometry_msgs::Polygon const &area, std::vector<geometry_msgs::Point> &waypoints)
     {
         // Make a polygon from the input
-        using namespace boost::geometry;
-        typedef model::d2::point_xy<float> geo_point;
-        model::polygon<geo_point> field;
-        for (auto point : area.points)
+        Poly field(Point(area.points[0].x, area.points[0].y));
+        for (int i = 1; i < area.points.size(); ++i)
         {
-            append(field, make<geo_point>(point.x, point.y));
+            field.add(Point(area.points[i].x, area.points[i].y));
         }
 
         // Make a checkerboard that covers it completely
@@ -113,16 +110,17 @@ namespace aseta
         float initial_y = min_y - margin_y;
         ROS_DEBUG_STREAM("Initial: " << initial_x << " " << initial_y);
             // Make a vector of footprints.
-        std::vector<model::box<geo_point>> footprint_list;
+        std::vector<Poly> footprint_list;
         for (int h = 0; h < num_horisontal_footprints; ++h)
         {
             for (int v = 0; v < num_vertial_footprints; ++v)
             {
                 float x = initial_x + v*footprint_width;
                 float y = initial_y + h*footprint_height;
-                geo_point min_corner(x, y);
-                geo_point max_corner(x + footprint_width, y + footprint_height);
-                model::box<geo_point> fp(min_corner, max_corner);
+                Poly fp(Point(x, y));
+                fp.add(Point(x + footprint_width, y));
+                fp.add(Point(x + footprint_width, y + footprint_height));
+                fp.add(Point(x, y + footprint_height));
                 footprint_list.push_back(fp);
             }
         }
@@ -132,17 +130,15 @@ namespace aseta
         // middle of the footprint, i.e. the drone is not tilting.
         for (auto fp : footprint_list)
         {
-            if (!disjoint(field, fp))
+            PolyPList   a_min_b, b_min_a, overlap;
+            clip_poly(field, fp, a_min_b, b_min_a, overlap);
+            if (!overlap.empty())
             {
                 geometry_msgs::Point p;
-                p.x = fp.min_corner().x() + footprint_width/2;
-                p.y = fp.min_corner().y() + footprint_height/2;
+                p.x = fp.firstpoint().x() + footprint_width/2;
+                p.y = fp.firstpoint().y() + footprint_height/2;
                 p.z = flying_height;
                 waypoints.push_back(p);
-            }
-            else
-            {
-                ROS_DEBUG_STREAM("Footprint: [" << fp.min_corner().x() << " " << fp.min_corner().y() << "][" << fp.max_corner().x() << " " << fp.max_corner().y() << "] does not intersect.");
             }
         }
         return;
