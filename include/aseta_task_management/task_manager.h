@@ -21,7 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TASK_MANAGER_H
 
 #include <geometry_msgs/PolygonStamped.h>
+#include <geometry_msgs/Point.h>
 #include <ros/ros.h>
+#include <string>
+#include <vector>
 #include "aseta_task_management/PhotographArea.h"
 
 namespace aseta
@@ -35,14 +38,23 @@ namespace aseta
 	private:
 		ros::NodeHandle priv_nh;
 		ros::ServiceServer register_task_service;
+
+		std::string reference_frame;
+
 		geometry_msgs::Polygon field;
 		ros::Publisher field_pub;
 		ros::Timer field_timer;
+
+		std::vector<geometry_msgs::Point> waypoints;
+		ros::Publisher waypoint_pub;
+		ros::Timer waypoint_timer;
 
 		bool registerTaskCb(aseta_task_management::PhotographArea::Request &,
 			                  aseta_task_management::PhotographArea::Response &);
 
 		void publishField(const ros::TimerEvent&);
+
+		void publishWaypoints(const ros::TimerEvent&);
 	};
 };
 

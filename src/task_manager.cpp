@@ -17,24 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <geometry_msgs/PoseArray.h>
 #include "aseta_task_management/task_manager.h"
+#include "aseta_task_management/decomposer.h"
 
 namespace aseta
 {
     TaskManager::TaskManager() :
         priv_nh("~")
     {
+        priv_nh.param<std::string>("reference_frame", reference_frame, "map");
         register_task_service = 
             priv_nh.advertiseService("register_task",
                                      &TaskManager::registerTaskCb,
                                      this);
         field_pub = priv_nh.advertise<geometry_msgs::PolygonStamped>("field", 1);
         field_timer = priv_nh.createTimer(ros::Duration(1.0), &TaskManager::publishField, this);
+        waypoint_pub = priv_nh.advertise<geometry_msgs::PoseArray>("waypoints", 1);
+        waypoint_timer = priv_nh.createTimer(ros::Duration(0.5), &TaskManager::publishWaypoints, this);
     }
 
     TaskManager::~TaskManager()
     {}
 
+    /// Callback funtion to respond to service requests for doing a task.
+    ///
+    /// @param req The request containing an area to photograph at a specified resolution.
+    /// @param[out] res A response when the task has been registered. This is empty for now.
     bool TaskManager::registerTaskCb(
         aseta_task_management::PhotographArea::Request &req,
         aseta_task_management::PhotographArea::Response &res)
@@ -46,12 +55,17 @@ namespace aseta
         if (field.points.size() == 0)
         {
             field = req.area;
-            for (auto p : field.points)
-                ROS_INFO_STREAM("Poly point: [" << p.x << " " << p.y << "]");
         }
+
+        // Decompose the task and put the waypoints into the list.
+        aseta::Decomposer d(100,100,0.01,10,10);
+        d.decompose(req.area, waypoints);
+
         return true;
     }
 
+    /// Callback to periodically publish the field we are working with.
+    ///
     void TaskManager::publishField(const ros::TimerEvent&)
     {
         if (field.points.size() > 0)
@@ -59,9 +73,28 @@ namespace aseta
             geometry_msgs::PolygonStamped f;
             f.polygon = field;
             f.header.stamp = ros::Time::now();
-            f.header.frame_id = "map";
+            f.header.frame_id = reference_frame;
             field_pub.publish(f);
         }
+    }
+
+    /// Callback to periodically publish the unvisited waypoints.
+    ///
+    void TaskManager::publishWaypoints(const ros::TimerEvent&)
+    {
+        // if (waypoints.size() > 0)
+        // {
+            geometry_msgs::PoseArray pa;
+            pa.header.stamp = ros::Time::now();
+            pa.header.frame_id = reference_frame;
+            for (auto wp : waypoints)
+            {
+                geometry_msgs::Pose p;
+                p.position = wp;
+                pa.poses.push_back(p);
+            }
+            waypoint_pub.publish(pa);
+        // }
     }
 }
 
