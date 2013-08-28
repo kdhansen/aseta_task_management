@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(aseta_task_management)
 
 find_package(catkin REQUIRED COMPONENTS actionlib_msgs actionlib geometry_msgs sensor_msgs roscpp rostest)
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system thread)
 find_library(Clippoly "libclippoly.so")
 if(${Clippoly} STREQUAL "Clippoly-NOTFOUND")
 	message("Could not find libclippoly")
@@ -59,12 +59,13 @@ add_library(libgatsp
     src/gatsp/Genome.cpp
     src/gatsp/GeneticAlgorithm.cpp
 )
+target_link_libraries(libgatsp ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_library(decomposer src/decomposer.cpp)
 target_link_libraries(decomposer ${catkin_LIBRARIES} ${Clippoly})
 
 add_executable(task_manager src/task_manager.cpp)
-target_link_libraries(task_manager ${catkin_LIBRARIES} decomposer)
+target_link_libraries(task_manager ${catkin_LIBRARIES} ${Boost_LIBRARIES} decomposer libgatsp)
 add_dependencies(task_manager ${PROJECT_NAME}_gencpp)
 
 add_executable(register_task src/register_task.cpp)

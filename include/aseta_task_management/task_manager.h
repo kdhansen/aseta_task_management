@@ -20,12 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
-#include <geometry_msgs/PolygonStamped.h>
-#include <geometry_msgs/Point.h>
-#include <ros/ros.h>
 #include <string>
 #include <vector>
+#include <boost/thread.hpp>
+#include <geometry_msgs/Point.h>
+#include <geometry_msgs/PolygonStamped.h>
+#include <ros/ros.h>
 #include "aseta_task_management/PhotographArea.h"
+#include "gatsp/GeneticAlgorithm.h"
 
 namespace aseta
 {
@@ -40,6 +42,9 @@ namespace aseta
 		ros::ServiceServer register_task_service;
 
 		std::string reference_frame;
+		
+		gatsp::GeneticAlgorithm tspga;
+		boost::thread ga_thread;
 
 		geometry_msgs::Polygon field;
 		ros::Publisher field_pub;
@@ -49,6 +54,9 @@ namespace aseta
 		ros::Publisher waypoint_pub;
 		ros::Timer waypoint_timer;
 
+		ros::Publisher path_pub;
+		ros::Timer path_timer;
+
 		int camera_sensor_width, camera_sensor_height;
 		double camera_focal_length_x, camera_focal_length_y;
 
@@ -56,8 +64,8 @@ namespace aseta
 			                  aseta_task_management::PhotographArea::Response &);
 
 		void publishField(const ros::TimerEvent&);
-
 		void publishWaypoints(const ros::TimerEvent&);
+		void publishPath(const ros::TimerEvent& event);
 	};
 };
 

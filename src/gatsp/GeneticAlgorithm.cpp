@@ -150,8 +150,21 @@ namespace gatsp
 	{
 		while (!done())
 		{
-			step();
+			try
+			{
+				_lock.lock();
+				step();
+				_lock.unlock();
+				boost::this_thread::interruption_point();
+			}
+			catch (const boost::thread_interrupted&)
+			{
+				std::cout << "GA interrupted..." << std::endl;
+				break;
+			}
 		}
+		std::cout << "GA done..." << std::endl;
+		return;
 	}
 
 	/// Reports how many generations the algorithm has evolved.
@@ -159,6 +172,7 @@ namespace gatsp
 	/// @returns Number of evolved generations.
 	unsigned int GeneticAlgorithm::generation() const
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		return _num_generations;
 	}
 
@@ -167,6 +181,7 @@ namespace gatsp
 	/// @param generations Maximum number of generations.
 	void GeneticAlgorithm::maxGenerations(unsigned int generations)
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		_max_generations = generations;
 	}
 
@@ -178,10 +193,21 @@ namespace gatsp
 		return _terminator(*this);
 	}
 
+	/// Set the terminator to something new.
+	///
+	/// @param terminator_function A function indicating wheter to terminate
+	///                            the algorithm.
+	void GeneticAlgorithm::setTerminator(std::function<bool(GeneticAlgorithm&)> terminator_function)
+	{
+		boost::lock_guard<boost::mutex> guard(_lock);
+		_terminator = terminator_function;
+	}
+
 	/// Termination criterion that terminates upon reaching max generations.
 	///
 	bool GeneticAlgorithm::terminateGenerations()
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		bool do_terminate = false;
 		if (_num_generations >= _max_generations)
 		{
@@ -197,11 +223,19 @@ namespace gatsp
 		return true;
 	}
 
+	/// Termination criterion that never stops the algorithm.
+	///
+	bool GeneticAlgorithm::terminateInfinite()
+	{
+		return false;
+	}
+
 	/// Add a waypoint to all individuals.
 	///
 	/// @param newWaypoint The Waypoint to add.
 	void GeneticAlgorithm::addWaypoint(const Waypoint& newWaypoint)
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		for (auto& individual : _population)
 		{
 			individual.addWaypoint(newWaypoint);
@@ -221,6 +255,7 @@ namespace gatsp
 	/// @param n index of waypoint to remove.
 	void GeneticAlgorithm::removeWaypoint(size_t n)
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		for (auto& individual : _population)
 		{
 			individual.removeWaypoint(n);
@@ -235,11 +270,13 @@ namespace gatsp
 	/// @returns The underlying Population.
 	const std::vector<Genome>& GeneticAlgorithm::population() const
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		return _population;
 	}
 
 	const Genome& GeneticAlgorithm::bestIndividual() const
 	{
+		boost::lock_guard<boost::mutex> guard(_lock);
 		return _population[_best_individual_idx];
 	}
 
