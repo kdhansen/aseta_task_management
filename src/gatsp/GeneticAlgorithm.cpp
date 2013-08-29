@@ -265,6 +265,26 @@ namespace gatsp
 		return;
 	}
 
+	/// Pop a waypoint of the front of the solution, i.e. the next waypoint.
+	///
+	/// Essentially a convenience function instead of letting the client
+	/// find, copy and remove the waypoint by himself.
+	///
+	/// @returns The next waypoint in the solution.
+	const Waypoint GeneticAlgorithm::popWaypoint() throw(EmptySolution)
+	{
+		const Problem& best_individual = bestIndividual();
+		auto solution = best_individual.solution();
+		if (0 == solution.size())
+		{
+			throw(EmptySolution());
+		}
+		size_t current_goal_idx = solution[0];
+		Waypoint wp(best_individual.waypoints()[current_goal_idx]);
+    	removeWaypoint(current_goal_idx);
+    	return wp;
+	}
+
 	/// Get the population of genomes that the algorithm is working on.
 	///
 	/// @returns The underlying Population.

@@ -37,9 +37,10 @@ namespace aseta
         // The register task service lets users (or ros nodes) supply the manager
         // with areas that must be photographed.
         register_task_service = 
-            priv_nh.advertiseService("register_task",
-                                     &TaskManager::registerTaskCb,
-                                     this);
+            priv_nh.advertiseService("register_task", &TaskManager::registerTaskCb, this);
+
+        // Serve next goal in line
+        next_goal_service = priv_nh.advertiseService("next_goal", &TaskManager::nextGoalCb, this);
 
         // The genetic algorithm will run in a tread of its own.
         tspga.setTerminator(&gatsp::GeneticAlgorithm::terminateInfinite);
@@ -65,9 +66,8 @@ namespace aseta
     ///
     /// @param req The request containing an area to photograph at a specified resolution.
     /// @param[out] res A response when the task has been registered. This is empty for now.
-    bool TaskManager::registerTaskCb(
-        aseta_task_management::PhotographArea::Request &req,
-        aseta_task_management::PhotographArea::Response &res)
+    bool TaskManager::registerTaskCb( aseta_task_management::PhotographArea::Request &req,
+                                      aseta_task_management::PhotographArea::Response &res)
     {
         ROS_INFO("Registering task.");
 
@@ -89,6 +89,29 @@ namespace aseta
         {
             gatsp::Waypoint gwp(gatsp::Point(wp.x, wp.y, wp.z), gatsp::Quarternion());
             tspga.addWaypoint(gwp);
+        }
+
+        return true;
+    }
+
+    /// Callback function to retreive the next waypoint in line from the genetic algorithm.
+    ///
+    /// @param req The request. Empty for now.
+    /// @param[out] res The goal specified as a pose in space.
+    /// @returns False if there is no waypoint in line.
+    bool TaskManager::nextGoalCb(aseta_task_management::Goal::Request&,
+                                 aseta_task_management::Goal::Response& res)
+    {
+        try
+        {
+            gatsp::Waypoint wp = tspga.popWaypoint();
+            res.goal.position.x = wp.x();
+            res.goal.position.y = wp.y();
+            res.goal.position.z = wp.z();
+        }
+        catch (gatsp::EmptySolution)
+        {
+            return false;
         }
 
         return true;

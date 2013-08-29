@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <geometry_msgs/PolygonStamped.h>
 #include <ros/ros.h>
 #include "aseta_task_management/PhotographArea.h"
+#include "aseta_task_management/Goal.h"
 #include "gatsp/GeneticAlgorithm.h"
 
 namespace aseta
@@ -40,6 +41,7 @@ namespace aseta
 	private:
 		ros::NodeHandle priv_nh;
 		ros::ServiceServer register_task_service;
+		ros::ServiceServer next_goal_service;
 
 		std::string reference_frame;
 		
@@ -61,7 +63,10 @@ namespace aseta
 		double camera_focal_length_x, camera_focal_length_y;
 
 		bool registerTaskCb(aseta_task_management::PhotographArea::Request &,
-			                  aseta_task_management::PhotographArea::Response &);
+			                aseta_task_management::PhotographArea::Response &);
+
+		bool nextGoalCb(aseta_task_management::Goal::Request &,
+			            aseta_task_management::Goal::Response &);
 
 		void publishField(const ros::TimerEvent&);
 		void publishWaypoints(const ros::TimerEvent&);

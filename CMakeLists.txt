@@ -31,7 +31,9 @@ add_action_files(
 )
 add_service_files(
 	DIRECTORY srv
-	FILES PhotographArea.srv
+	FILES 
+	PhotographArea.srv
+	Goal.srv
 )
 
 generate_messages(

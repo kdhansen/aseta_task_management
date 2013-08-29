@@ -6,6 +6,7 @@
 #ifndef GATSP_GENETIC_ALGORITHM_H
 #define GATSP_GENETIC_ALGORITHM_H
 
+#include <exception>
 #include <functional>
 #include <random>
 #include <vector>
@@ -15,6 +16,14 @@
 
 namespace gatsp
 {
+    class EmptySolution: public std::exception
+    {
+      virtual const char* what() const throw()
+      {
+        return "No waypoints in solution.";
+      }
+    };
+
     class GeneticAlgorithm
     {
     public:
@@ -36,6 +45,7 @@ namespace gatsp
 
         void addWaypoint(const Waypoint&);
         void removeWaypoint(size_t);
+        const Waypoint popWaypoint() throw(EmptySolution);
 
         const std::vector<Genome>& population() const;
         const Genome& bestIndividual() const;
