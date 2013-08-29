@@ -15,6 +15,7 @@ Version 0.1:
         + Implement genetic algorithm. @done (13-08-29 15:56)
         + Thread the genetic algorithm, so that we can pump a lot of waypoints into it. @done (13-08-29 15:56)
             + Make a mutex to protect the genomes. @done (13-08-29 15:56)
+        - Throttle when termination criterion has been met.
     Utillities:
         - Implement command line utility.
         - Implement dummy drone.
