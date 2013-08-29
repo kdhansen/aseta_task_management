@@ -31,8 +31,8 @@ namespace aseta
         priv_nh.param<std::string>("reference_frame", reference_frame, "map");
         priv_nh.param("camera_sensor_width", camera_sensor_width, 640);
         priv_nh.param("camera_sensor_height", camera_sensor_height, 480);
-        priv_nh.param("camera_focal_length_x", camera_focal_length_x, camera_sensor_width*1.1);
-        priv_nh.param("camera_focal_length_y", camera_focal_length_y, camera_sensor_height*1.1);
+        priv_nh.param("camera_focal_length_x", camera_focal_length_x, 500.0);
+        priv_nh.param("camera_focal_length_y", camera_focal_length_y, 500.0);
 
         // The register task service lets users (or ros nodes) supply the manager
         // with areas that must be photographed.

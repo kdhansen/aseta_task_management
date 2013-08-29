@@ -97,12 +97,12 @@ namespace aseta
         }
         ROS_DEBUG_STREAM("Bounding box: [" << min_x << " " << min_y << "][" << max_x << " " << max_y << "]");
             // Find out how many footprints that fits.
-        int num_horisontal_footprints = ceil((max_x - min_x) / footprint_width);
-        int num_vertial_footprints = ceil((max_y - min_y) / footprint_height);
+        int num_vertical_footprints = ceil((max_x - min_x) / footprint_width);
+        int num_horisontal_footprints = ceil((max_y - min_y) / footprint_height);
         ROS_DEBUG_STREAM("Number of horisontal images: " << num_horisontal_footprints);
-        ROS_DEBUG_STREAM("Number of vertical images: " << num_vertial_footprints);
+        ROS_DEBUG_STREAM("Number of vertical images: " << num_vertical_footprints);
             // Since we ceil the amount, we get a margin.
-        float margin_x = ((num_vertial_footprints * footprint_width) - (max_x - min_x)) / 2;
+        float margin_x = ((num_vertical_footprints * footprint_width) - (max_x - min_x)) / 2;
         ROS_DEBUG_STREAM("Margin x: " << margin_x);
         float margin_y = ((num_horisontal_footprints * footprint_height) - (max_y - min_y)) / 2;
         ROS_DEBUG_STREAM("Margin y: " << margin_y);
@@ -113,7 +113,7 @@ namespace aseta
         std::vector<Poly> footprint_list;
         for (int h = 0; h < num_horisontal_footprints; ++h)
         {
-            for (int v = 0; v < num_vertial_footprints; ++v)
+            for (int v = 0; v < num_vertical_footprints; ++v)
             {
                 float x = initial_x + v*footprint_width;
                 float y = initial_y + h*footprint_height;
@@ -141,6 +141,7 @@ namespace aseta
                 waypoints.push_back(p);
             }
         }
+
         return;
     }
 }
