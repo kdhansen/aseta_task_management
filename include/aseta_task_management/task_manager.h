@@ -22,16 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 #include <vector>
+#include <actionlib/client/simple_action_client.h>
 #include <boost/thread.hpp>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PolygonStamped.h>
 #include <ros/ros.h>
 #include "aseta_task_management/PhotographArea.h"
+#include "aseta_task_management/PhotoWaypointAction.h"
 #include "aseta_task_management/Goal.h"
 #include "gatsp/GeneticAlgorithm.h"
 
 namespace aseta
 {
+
+	typedef actionlib::SimpleActionClient<aseta_task_management::PhotoWaypointAction> PhotoWaypointActionClient;
+
 	class TaskManager
 	{
 	public:
@@ -43,6 +48,11 @@ namespace aseta
 		ros::ServiceServer register_task_service;
 		ros::ServiceServer next_goal_service;
 
+		PhotoWaypointActionClient * drone_action_client;
+		std::string drone_action_server;
+		bool task_assigned;
+
+		ros::Timer manager_timer;
 		std::string reference_frame;
 		
 		gatsp::GeneticAlgorithm tspga;
@@ -61,6 +71,8 @@ namespace aseta
 
 		int camera_sensor_width, camera_sensor_height;
 		double camera_focal_length_x, camera_focal_length_y;
+
+		void updateTaskManager(const ros::TimerEvent&);
 
 		bool registerTaskCb(aseta_task_management::PhotographArea::Request &,
 			                aseta_task_management::PhotographArea::Response &);

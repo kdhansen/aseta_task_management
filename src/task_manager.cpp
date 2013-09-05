@@ -25,14 +25,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace aseta
 {
     TaskManager::TaskManager() :
-        priv_nh("~")
+        priv_nh("~"),
+        task_assigned(false)
     {
         // Get parameters
+        priv_nh.param<std::string>("drone_action_server", drone_action_server, "dummy_drone/task_server");
         priv_nh.param<std::string>("reference_frame", reference_frame, "map");
         priv_nh.param("camera_sensor_width", camera_sensor_width, 640);
         priv_nh.param("camera_sensor_height", camera_sensor_height, 480);
         priv_nh.param("camera_focal_length_x", camera_focal_length_x, 500.0);
         priv_nh.param("camera_focal_length_y", camera_focal_length_y, 500.0);
+
+        // Connect to the working drone.
+        drone_action_client = new PhotoWaypointActionClient(drone_action_server, true);
+        bool connected_to_drone = false;
+        while (!drone_action_client->waitForServer(ros::Duration(5)))
+        {
+            ROS_INFO("Not connected to drone, retrying...");
+        }
+        ROS_INFO("Connected to drone.");
+
+        // The manager will periodically check that the drones are working.
+        manager_timer = priv_nh.createTimer(ros::Duration(1.0), &TaskManager::updateTaskManager, this);
 
         // The register task service lets users (or ros nodes) supply the manager
         // with areas that must be photographed.
@@ -52,7 +66,7 @@ namespace aseta
         field_timer = priv_nh.createTimer(ros::Duration(1.0), &TaskManager::publishField, this);
         waypoint_pub = priv_nh.advertise<geometry_msgs::PoseArray>("waypoints", 1);
         waypoint_timer = priv_nh.createTimer(ros::Duration(0.5), &TaskManager::publishWaypoints, this);
-
+        // The path publisher, shows the current best solution of to the routing, problem.
         path_pub = priv_nh.advertise<nav_msgs::Path>("path", 1);
         path_timer = priv_nh.createTimer(ros::Duration(0.5), &TaskManager::publishPath, this);
     }
@@ -60,6 +74,39 @@ namespace aseta
     TaskManager::~TaskManager()
     {
         ga_thread.interrupt();
+        delete drone_action_client;
+    }
+
+    void TaskManager::updateTaskManager(const ros::TimerEvent&)
+    {
+        if (task_assigned)
+        {
+            auto drone_state = drone_action_client->getState();
+            ROS_INFO_STREAM("Drone: " << drone_state.toString());
+            if (drone_state == actionlib::SimpleClientGoalState::SUCCEEDED)
+            {
+                task_assigned = false;
+            }
+        }
+        
+        if (!task_assigned)
+        {
+            try
+            {
+                gatsp::Waypoint wp = tspga.popWaypoint();
+                aseta_task_management::PhotoWaypointGoal goal;
+                goal.pose.position.x = wp.x();
+                goal.pose.position.y = wp.y();
+                goal.pose.position.z = wp.z();
+                drone_action_client->sendGoal(goal);
+                task_assigned = true;
+            }
+            catch (gatsp::EmptySolution)
+            {
+                return;
+            }
+        }
+        return;
     }
 
     /// Callback funtion to respond to service requests for doing a task.
