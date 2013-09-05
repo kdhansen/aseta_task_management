@@ -7,4 +7,8 @@
 		<param name="camera_focal_length_x" type="double" value="500.0" />
 		<param name="camera_focal_length_y" type="double" value="500.0" />
 	</node>
+	<node name="dummy_drone" pkg="aseta_task_management" type="dummy_drone" output="screen">
+		<param name="speed" type="double" value="10.0" />
+		<param name="reference_frame" value="map" />
+	</node>
 </launch>

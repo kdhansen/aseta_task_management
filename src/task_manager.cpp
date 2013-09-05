@@ -77,6 +77,10 @@ namespace aseta
         delete drone_action_client;
     }
 
+    /// Updates the state of the manager.
+    ///
+    /// Checks wheter the drone is available or busy. If it is available,
+    /// a new task is assigned.
     void TaskManager::updateTaskManager(const ros::TimerEvent&)
     {
         if (task_assigned)

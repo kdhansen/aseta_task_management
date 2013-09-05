@@ -2,7 +2,7 @@ ASETA Task management system:
 
 Version 0.1:
     Version 0.1 will be funtional with no bells and whistles.
-    - Implement actionlib client for drone.
+    + Implement actionlib client for drone. @done (13-09-05 14:28)
     x Implement actionlib server for registering tasks. @cancelled (13-08-29 15:57)
     Task Manager:
         - Implement list of outstanding/finished tasks.
@@ -16,10 +16,12 @@ Version 0.1:
         + Thread the genetic algorithm, so that we can pump a lot of waypoints into it. @done (13-08-29 15:56)
             + Make a mutex to protect the genomes. @done (13-08-29 15:56)
         - Throttle when termination criterion has been met.
+        - Implement adaptive termination criterion.
         - Set number of fixed waypoints.
     Utillities:
         - Implement command line utility.
-        - Implement dummy drone.
+        + Implement dummy drone. @done (13-09-05 14:36)
+            + Implement trajectory flying. @done (13-09-05 18:07)
     Minor tasks:
      + Correct polygon type in action/PhotographArea.action @done (13-08-19 12:00)
      + Debug boost::geometry for queer disjoint predicate behaviour. @done (13-08-29 15:56)
@@ -31,7 +33,6 @@ Version 0.2:
      - In cli: Check file existence.
      - Modify stream output of Problem/Waypoint/Solution to match TSPLIB.
      - Export time in history.
-     - Implement adaptive termination criterion.
      - Implement crossover.
      - Figure out if clone can be optimized by only copying the solution.
 
