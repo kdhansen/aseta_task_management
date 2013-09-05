@@ -1,5 +1,5 @@
 <launch>
-	<node name="rviz" pkg="rviz" type="rviz" />
+	<!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
 	<node name="task_manager" pkg="aseta_task_management" type="task_manager" output="screen">
 		<param name="reference_frame" value="map" />
 		<param name="camera_sensor_width" type="int" value="640" />
