@@ -285,6 +285,16 @@ namespace gatsp
     	return wp;
 	}
 
+	void GeneticAlgorithm::setNumFixedWaypoints(unsigned int n)
+	{
+		_num_fixed_waypoints = n;
+	}
+
+	unsigned int GeneticAlgorithm::numFixedWaypoints()
+	{
+		return _num_fixed_waypoints;
+	}
+
 	/// Get the population of genomes that the algorithm is working on.
 	///
 	/// @returns The underlying Population.

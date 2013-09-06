@@ -46,6 +46,8 @@ namespace gatsp
         void addWaypoint(const Waypoint&);
         void removeWaypoint(size_t);
         const Waypoint popWaypoint() throw(EmptySolution);
+        void setNumFixedWaypoints(unsigned int);
+        unsigned int numFixedWaypoints();
 
         const std::vector<Genome>& population() const;
         const Genome& bestIndividual() const;
@@ -54,6 +56,8 @@ namespace gatsp
         void findBestIndividual();
 
         mutable boost::mutex _lock;
+
+        unsigned int _num_fixed_waypoints;
 
     	unsigned int _max_generations;
     	unsigned int _num_generations;
