@@ -5,9 +5,9 @@
 // This file is part of the GATSP project.
 // Copyright 2012-2013 Karl Damkjær Hansen, Aalborg University
 
+#include <algorithm>
 #include <regex>
 #include <sstream>
-#include <algorithm>
 #include "gatsp/Problem.h"
 
 namespace gatsp
