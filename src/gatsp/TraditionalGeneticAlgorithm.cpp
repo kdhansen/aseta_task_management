@@ -21,15 +21,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace gatsp
 {
+    TraditionalGeneticAlgorithm::TraditionalGeneticAlgorithm(
+        std::shared_ptr<ProblemBase> problem,
+        int num_individuals, 
+        double mutate_rate, 
+        double crossover_rate, 
+        unsigned int seed
+    ) 
+        : GeneticAlgorithmBase(problem, num_individuals, mutate_rate, crossover_rate, seed)
+    {}
+
     void TraditionalGeneticAlgorithm::mutate()
     {
         // Make a probability generator to decide whether to mutate.
         std::uniform_real_distribution<double> probability(0, 1);
-        bool doMutate = (probability(_random_generator) < _crossover_rate);
+        bool doMutate = (probability(_random_generator) < _mutate_rate);
 
-        for (auto sol : _individuals)
+        for (auto& sol : _individuals)
         {
-            if ((2 < sol->size()) && doMutate)
+            if ((2 < sol.size()) && doMutate)
             {
                 // Choose mutation.
                 std::uniform_int_distribution<unsigned int> which_mutation(0, 2);
@@ -52,20 +62,26 @@ namespace gatsp
 
     void TraditionalGeneticAlgorithm::crossover()
     {
-        
+        // Decide whether to crossover
+        std::uniform_real_distribution<double> probability(0,1);
+        bool doCrossover = (probability(_random_generator) < _crossover_rate);
+        if(! doCrossover)
+        {
+            return;
+        }
+
         // Make a roulette wheel
         std::vector<double> roulette_wheel;
         roulette_wheel.reserve(_individuals.size());
         double total_score = 0.0;
-        for (auto ind : _individuals)
+        for (auto c : _costs)
         {
-            double recip_cost = 1.0/_problem->solutionCost(*ind);
-            roulette_wheel.push_back(recip_cost);
-            total_score += recip_cost;
+            total_score += 1.0/c;
+            roulette_wheel.push_back(total_score);
         }
         
         // Make children
-        std::vector<std::shared_ptr<SolutionBase> > children;
+        std::vector<SolutionBase> children;
         children.reserve(_individuals.size());
         for (size_t idx_child = 0; idx_child < _individuals.size(); ++idx_child)
         {
@@ -83,7 +99,7 @@ namespace gatsp
                     ++idx_parent;
                 }
             }
-            std::shared_ptr<SolutionBase> s(new SolutionBase(*(_individuals[idx_parent])));
+            SolutionBase s(_individuals[idx_parent]);
             children.push_back(s);
         }
 
@@ -101,9 +117,9 @@ namespace gatsp
     /// insertion_point is where the range of indices already are located.
     /// In that case, the vector is not mutated.
     ///
-    void TraditionalGeneticAlgorithm::displacementMutation(std::shared_ptr<SolutionBase> s)
+    void TraditionalGeneticAlgorithm::displacementMutation(SolutionBase& s)
     {
-        size_t solution_length = s->size();
+        size_t solution_length = s.size();
         std::uniform_int_distribution<size_t> dist_subtour_index(0, solution_length-1);
         size_t subtour_index = dist_subtour_index(_random_generator);
         std::uniform_int_distribution<size_t> dist_subtour_length(1, solution_length - subtour_index);
@@ -111,7 +127,7 @@ namespace gatsp
         std::uniform_int_distribution<size_t> dist_insertion_point(0, solution_length - subtour_length);
         size_t insertion_point = dist_insertion_point(_random_generator);
 
-        auto subtour_begin = s->begin() + subtour_index;
+        auto subtour_begin = s.begin() + subtour_index;
         auto subtour_end = subtour_begin + subtour_length;      
 
         if (insertion_point > subtour_index)
@@ -120,7 +136,7 @@ namespace gatsp
         {
             SolutionBase subtour(subtour_begin, subtour_end);
             auto affected_portion_begin = subtour_end;
-            auto affected_portion_end =  s->begin() 
+            auto affected_portion_end =  s.begin() 
                                        + insertion_point
                                        + subtour_length;
             auto to = subtour_begin;
@@ -142,7 +158,7 @@ namespace gatsp
         else if (insertion_point < subtour_index)
         // Here the affected region is picked out instead.
         {
-            auto affected_portion_begin = s->begin() + insertion_point;
+            auto affected_portion_begin = s.begin() + insertion_point;
             auto affected_portion_end = subtour_begin;
             SolutionBase affected_portion(affected_portion_begin,
                                                  affected_portion_end);
@@ -163,16 +179,15 @@ namespace gatsp
                 ++to;
             }
         }
-
         return;
     }
 
     /// Exchange mutation. This mutation chooses two indices and swaps the
     /// content.
     ///
-    void TraditionalGeneticAlgorithm::exchangeMutation(std::shared_ptr<SolutionBase> s)
+    void TraditionalGeneticAlgorithm::exchangeMutation(SolutionBase& s)
     {
-        size_t solution_length = s->size();
+        size_t solution_length = s.size();
         std::uniform_int_distribution<size_t> dist(0, solution_length-1);
         size_t index1 = dist(_random_generator);
         size_t index2 = dist(_random_generator);
@@ -180,17 +195,18 @@ namespace gatsp
         {
             index2 = dist(_random_generator);
         }
-        auto section_begin = s->begin() + index1;
-        auto section_end = s->begin() + index2;
+        auto section_begin = s.begin() + index1;
+        auto section_end = s.begin() + index2;
         std::swap(*section_begin, *section_end);
+        return;
     }
 
     /// Inversion mutation. This mutation chooses a range in the list and
     /// reverses the sequence in that range.
     ///
-    void TraditionalGeneticAlgorithm::inversionMutation(std::shared_ptr<SolutionBase> s)
+    void TraditionalGeneticAlgorithm::inversionMutation(SolutionBase& s)
     {
-        size_t solution_length = s->size();
+        size_t solution_length = s.size();
         std::uniform_int_distribution<size_t> dist(0, solution_length-1);
         size_t index1 = dist(_random_generator);
         size_t index2 = dist(_random_generator);
@@ -202,8 +218,8 @@ namespace gatsp
         {
             std::swap(index1, index2);
         }
-        auto section_begin = s->begin() + index1;
-        auto section_end = s->begin() + index2;
+        auto section_begin = s.begin() + index1;
+        auto section_end = s.begin() + index2;
         size_t num_swaps = (index2 - index1) / 2 + 1;
         for (size_t i = 0; i < num_swaps; ++i)
         {
@@ -211,5 +227,6 @@ namespace gatsp
             ++section_begin;
             --section_end;
         }
+        return;
     }
 }

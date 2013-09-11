@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef PROBLEM_BASE_H
 #define PROBLEM_BASE_H
 
-#include <memory>
 #include <vector>
 #include "gatsp/Waypoint.h"
 #include "gatsp/SolutionBase.h"
@@ -33,7 +32,7 @@ namespace gatsp
         ProblemBase() = default;
         virtual ~ProblemBase() = default;
 
-        virtual std::shared_ptr<SolutionBase> makeSolution() = 0;
+        virtual SolutionBase makeSolution() = 0;
         virtual std::vector<Waypoint> route(const SolutionBase&) = 0;
         virtual Waypoint firstWaypoint(const SolutionBase&) = 0;
         virtual void popWaypointFront(const SolutionBase&) = 0;

@@ -22,8 +22,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace gatsp
 {
-    std::shared_ptr<SolutionBase> Euclidean3DProblem::makeSolution()
-    {}
+    SolutionBase Euclidean3DProblem::makeSolution()
+    {
+        SolutionBase solution;
+        solution.reserve(_waypoints.size());
+        for(size_t i = 0; i < _waypoints.size(); ++i)
+        {
+            solution.push_back(i);
+        }
+        return solution;
+    }
 
     /// Compile a route of waypoints from the given solution.
     ///
@@ -101,8 +109,7 @@ namespace gatsp
         }
 
         double dist = 0.0;
-
-        if (2 < solution.size()) // Cannot compute distance between less than two wps.
+        if (2 <= solution.size()) // Cannot compute distance between less than two wps.
         {
             // Traverse the solution
             for (auto s = solution.begin(); s!= solution.end()-1; ++s)

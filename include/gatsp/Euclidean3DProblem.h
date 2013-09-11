@@ -27,7 +27,7 @@ namespace gatsp
     class Euclidean3DProblem : public ProblemBase
     {
     public:
-        virtual std::shared_ptr<SolutionBase> makeSolution();
+        virtual SolutionBase makeSolution();
         virtual std::vector<Waypoint> route(const SolutionBase&) throw(InvalidSolution);
         virtual Waypoint firstWaypoint(const SolutionBase&) throw(InvalidSolution);
         virtual void popWaypointFront(const SolutionBase&) throw(InvalidSolution);

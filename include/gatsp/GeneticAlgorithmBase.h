@@ -38,24 +38,30 @@ namespace gatsp
 		    double crossover_rate, 
 		    unsigned int seed
 		);
-		virtual ~GeneticAlgorithmBase();
+		virtual ~GeneticAlgorithmBase() = default;
 
 		void evolve();
 		void stop();
 		bool isRunning();
 		bool isDone();
+		virtual void step();
+		SolutionBase bestSolution();
 
 	private:
-		virtual void step();
 		virtual void mutate() = 0;
 		virtual void crossover() = 0;
 		virtual bool terminate() = 0;
+
+		void evaluateIndividuals();
 
 	protected:
 		std::shared_ptr<ProblemBase> _problem;
 		
 		int	_num_individuals;
-		std::vector<std::shared_ptr<SolutionBase> > _individuals;
+		std::vector<SolutionBase> _individuals;
+		std::vector<double> _costs;
+		SolutionBase _best_individual;
+		double _best_cost;
 
 		double _mutate_rate;
 		double _crossover_rate;

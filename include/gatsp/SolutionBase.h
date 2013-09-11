@@ -26,6 +26,8 @@ namespace gatsp
 {
     struct SolutionEntryBase
     {
+        SolutionEntryBase() = default;
+        SolutionEntryBase(size_t i) {index = i;}
         size_t index;
     };
 

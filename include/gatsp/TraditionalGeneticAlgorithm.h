@@ -23,13 +23,22 @@ namespace gatsp
 {
     class TraditionalGeneticAlgorithm : public GeneticAlgorithmBase
     {
+    public:
+        TraditionalGeneticAlgorithm(
+            std::shared_ptr<ProblemBase> problem,
+            int num_individuals = 100, 
+            double mutate_rate = 1.0, 
+            double crossover_rate = 1.0, 
+            unsigned int seed = 0
+        );
+        virtual ~TraditionalGeneticAlgorithm() = default;
     private:
         virtual void mutate();
         virtual void crossover();
         virtual bool terminate();
 
-        void displacementMutation(std::shared_ptr<SolutionBase>);
-        void exchangeMutation(std::shared_ptr<SolutionBase>);
-        void inversionMutation(std::shared_ptr<SolutionBase>);
+        void displacementMutation(SolutionBase&);
+        void exchangeMutation(SolutionBase&);
+        void inversionMutation(SolutionBase&);
     };
 }

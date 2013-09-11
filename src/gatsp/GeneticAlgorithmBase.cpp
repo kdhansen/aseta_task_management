@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <limits>
 #include "gatsp/GeneticAlgorithmBase.h"
 
 namespace gatsp
@@ -33,7 +34,8 @@ namespace gatsp
         _num_individuals(num_individuals),
         _mutate_rate(mutate_rate),
         _crossover_rate(crossover_rate),
-        _random_generator(std::mt19937(seed))
+        _random_generator(std::mt19937(seed)),
+        _best_cost(std::numeric_limits<double>::infinity())
     {
         // Generate the population.
         _individuals.reserve(_num_individuals);
@@ -41,6 +43,7 @@ namespace gatsp
         {
         	_individuals.push_back(problem->makeSolution());
         }
+        evaluateIndividuals();
     }
 
     // Evolve the problem until the solution criterion is satisfied.
@@ -107,6 +110,33 @@ namespace gatsp
         // - Mutate the babies.
         crossover();
         mutate();
+        evaluateIndividuals();
+        return;
+    }
+
+    /// Get the best solution.
+    ///
+    SolutionBase GeneticAlgorithmBase::bestSolution()
+    {
+        return _best_individual;
+    }
+
+    /// Evaluate the individuals and update the all-time high.
+    ///
+    void GeneticAlgorithmBase::evaluateIndividuals()
+    {
+        std::vector<double> new_costs;
+        for (auto ind : _individuals)
+        {
+            double cost = _problem->solutionCost(ind);
+            new_costs.push_back(cost);
+            if (cost < _best_cost)
+            {
+                _best_cost = cost;
+                _best_individual = ind;
+            }
+        }
+        _costs.swap(new_costs);
         return;
     }
 }
